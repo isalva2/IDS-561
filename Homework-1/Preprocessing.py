@@ -10,8 +10,8 @@ def Preprocessing(file):
     # tokenize using nltk
     words = nltk.word_tokenize(text)
 
-    # remove special chars and punctuation
-    tokens = [word for word in words if word.isalpha()]
+    # remove special chars and punctuation, lowercase tokens
+    tokens = [word.lower() for word in words if word.isalpha()]
 
     return tokens
 
