@@ -1,4 +1,5 @@
 import re
+import ast
 
 # preprocessing function
 def preprocessing(file):
@@ -50,3 +51,24 @@ def splitter(keyval_pairs, num_splits = 2):
     return splits
     
 # mapper
+def mapper(split):
+
+    # create empty return list
+    keyval_pairs = []
+
+    # loop through input and append 
+    for string in split:
+
+        # use ast method to return tuples of integers
+        literal_eval = ast.literal_eval(string)
+
+        # append tuple pairs to return list
+        keyval_pairs.append(literal_eval[0])
+        keyval_pairs.append(literal_eval[1])
+    
+    # change key to approriate year format
+    keyval_pairs = [(int(str(keyval[0])[:-2]), keyval[1]) for keyval in keyval_pairs]
+
+    return keyval_pairs
+
+# ShuffleSort
