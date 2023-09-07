@@ -1,14 +1,14 @@
 import re
 import ast
+import itertools
 
-# preprocessing function
 def preprocessing(file):
 
     '''
-    This function returns a list of strings in the format "(YEAR, MONTH), (YEAR MONTH)"
+    This function returns a list of strings in the format "(YEAR-MONTH, TEMP), (YEAR-MONTH, TEMP)"
     '''
     
-    # empty return object
+    # empty return list
     output = []
 
     # read file contents
@@ -18,17 +18,8 @@ def preprocessing(file):
             # append to list and remove newline character "\n"
             output.append(line[:-1])
 
-    '''
-    # use regular expression to extract tuples
-    tuples = re.findall(r'\((\d+),\s*(\d+)\)', file_contents)
-
-    # convert to int for downstream processing, remove month from keys
-    keyval_pairs = [(int(value1[:-2]), int(value2)) for value1, value2 in tuples]
-    '''
-
     return output
 
-# splitter function
 def splitter(keyval_pairs, num_splits = 2):
 
     '''
@@ -50,8 +41,11 @@ def splitter(keyval_pairs, num_splits = 2):
 
     return splits
     
-# mapper
 def mapper(split):
+
+    '''
+    This maps the input split into key-value pairs and modifies the key to year only. Returns a list of tuples in the form of (YEAR, TEMP)
+    '''
 
     # create empty return list
     keyval_pairs = []
@@ -66,9 +60,22 @@ def mapper(split):
         keyval_pairs.append(literal_eval[0])
         keyval_pairs.append(literal_eval[1])
     
-    # change key to approriate year format
+    # change key to appropriate year format
     keyval_pairs = [(int(str(keyval[0])[:-2]), keyval[1]) for keyval in keyval_pairs]
 
     return keyval_pairs
 
-# ShuffleSort
+def sort(*multiple_keyval_pairs):
+
+    '''
+    This function combines the seperated key-value pairs and sorts on the year key
+    '''
+    
+    # recombine keyval_pairs
+    recombined_keyval_pairs = list(itertools.chain(*multiple_keyval_pairs))
+
+    # sort values
+    sorted_keyval_pairs = sorted(recombined_keyval_pairs, key = lambda x: x[0])
+
+    return sorted_keyval_pairs
+
