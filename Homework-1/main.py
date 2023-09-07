@@ -1,6 +1,7 @@
 import re
 import ast
 import itertools
+import pandas as pd
 
 def preprocessing(file):
 
@@ -20,14 +21,14 @@ def preprocessing(file):
 
     return output
 
-def splitter(keyval_pairs, num_splits = 2):
+def splitter(input, num_splits = 2):
 
     '''
-    This function splits the dataset into an arbitrary number of splits, 2 at the minimum.
+    This function splits the dataset into an arbitrary number of n splits (n = 2 by default).
     '''
 
     # get indices for splits
-    split_size = len(keyval_pairs) // num_splits
+    split_size = len(input) // num_splits
 
     # empty return list
     splits = []
@@ -36,7 +37,7 @@ def splitter(keyval_pairs, num_splits = 2):
     for i in range (num_splits):
         start =  i*split_size
         end = (i+1)*split_size if i < num_splits - 1 else None
-        split = keyval_pairs[start:end]
+        split = input[start:end]
         splits.append(split)
 
     return splits
@@ -79,3 +80,94 @@ def sort(*multiple_keyval_pairs):
 
     return sorted_keyval_pairs
 
+def partition(sorted_keyval_pairs, partitions = 2):
+    
+    '''
+    This function takes the sorted key-value pairs and seperates them into n partitions (n = 2 by default).
+    '''
+
+    # obtain unique keys from the sorted key-value pairs
+    unique_years = {year for year, _ in sorted_keyval_pairs}
+    unique_years = sorted(list(unique_years))
+
+    # index unique years for partitioning
+    partition_size = len(unique_years) // partitions
+
+    year_splits = []
+    
+    for i in range (partitions):
+        start =  i*partition_size
+        end = (i+1)*partition_size if i < partitions - 1 else None
+        split = unique_years[start:end]
+        year_splits.append(split)
+
+    # return partitions
+    partitions = []
+
+    for years in year_splits:
+        partition = [keyval_pair for keyval_pair in sorted_keyval_pairs if keyval_pair[0] in years]
+        partitions.append(partition)
+
+    return partitions
+
+def reducer(partition):
+
+    '''
+    This function performs the search for maximum temperature for each year.
+    '''
+
+    # empty return dict
+    reduced_keyval_pairs = {}
+
+    for key, value in partition:
+        if key not in reduced_keyval_pairs.keys():
+            reduced_keyval_pairs[key] = value
+        else:
+            if reduced_keyval_pairs[key] < value:
+                reduced_keyval_pairs[key] = value
+    
+    return reduced_keyval_pairs
+
+def main():
+
+    '''
+    This main function is the final driver for the MapReduce task.
+    '''
+
+    # get input file
+    file = "Homework-1/data/temperatures.txt"
+
+    # preprocess data
+    clean_text = preprocessing(file)
+
+    # split data
+    split1, split2 = splitter(clean_text)
+
+    # pass splits to two mappers
+    mapper1 = mapper(split1)
+    mapper2 = mapper(split2)
+
+    # shuffle sort mapper outputs
+    sorted_keyval_pairs = sort(mapper1, mapper2)
+
+    # partition sorted key-value pairs
+    partition1, partition2 = partition(sorted_keyval_pairs)
+
+    # pass partition to two reducers
+    reducer1 = reducer(partition1)
+    reducer2 = reducer(partition2)
+
+    # combine reducers
+    combined_reducers = {**reducer1, **reducer2}
+
+    # convert to df
+    df = pd.DataFrame.from_dict(combined_reducers, orient='index', columns=['Value']).reset_index()
+    df.columns = ['year', 'Max temp']
+
+    # print and save
+    print(df)
+
+    df.to_csv("./Homework-1/data/output.csv", index = False)
+
+if __name__ == '__main__':
+    main()
