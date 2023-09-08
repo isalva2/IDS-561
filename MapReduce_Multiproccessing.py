@@ -5,7 +5,7 @@ import pandas as pd
 from time import time
 import multiprocessing
 
-def preprocessing(file):
+def preprocessing(file: str) -> list[str]:
 
     '''
     This function returns a list of strings in the format "(YEAR-MONTH, TEMP), (YEAR-MONTH, TEMP)"
@@ -23,7 +23,7 @@ def preprocessing(file):
 
     return output
 
-def splitter(input, num_splits = 2):
+def splitter(input: list[str], num_splits: int = 2) -> list[list[str]]:
 
     '''
     This function splits the dataset into an arbitrary number of n splits (n = 2 by default).
@@ -44,7 +44,7 @@ def splitter(input, num_splits = 2):
 
     return splits
     
-def mapper(split):
+def mapper(split: list[list[str]]) -> list[tuple]:
 
     '''
     This maps the input split into key-value pairs and modifies the key to year only. Returns a list of tuples in the form of (YEAR, TEMP)
@@ -68,7 +68,7 @@ def mapper(split):
 
     return keyval_pairs
 
-def sort(*multiple_keyval_pairs):
+def sort(*multiple_keyval_pairs) -> list[tuple]:
 
     '''
     This function combines the seperated key-value pairs and sorts on the year key
@@ -82,7 +82,7 @@ def sort(*multiple_keyval_pairs):
 
     return sorted_keyval_pairs
 
-def partition(sorted_keyval_pairs, partitions = 2):
+def partition(sorted_keyval_pairs: list[tuple], partitions: int = 2) -> list[list[tuple]]:
     
     '''
     This function takes the sorted key-value pairs and seperates them into n partitions (n = 2 by default).
@@ -112,7 +112,7 @@ def partition(sorted_keyval_pairs, partitions = 2):
 
     return partitions
 
-def reducer(partition):
+def reducer(partition: list[tuple]) -> dict:
 
     '''
     This function performs the search for maximum temperature for each year.
@@ -200,3 +200,5 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+    splitter.__annotations__
