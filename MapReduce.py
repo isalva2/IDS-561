@@ -3,7 +3,6 @@ import ast
 import itertools
 import pandas as pd
 from time import time
-import multiprocessing
 
 def preprocessing(file):
 
@@ -134,69 +133,49 @@ def main():
 
     '''
     This main function is the final driver for the MapReduce task.
-
-    We utilize the multiprocessing module to simulate worker nodes.
     '''
-    
-    #create pool of worker processes
-    num_workers = 2
-    pool = multiprocessing.Pool(processes=num_workers)
+
+    # measure MapReduce run time
+    start = time()
 
     # get input file
-    file = "Homework-1/data/temperatures.txt"
+    file = "data/temperatures.txt"
 
     # preprocess data
     clean_text = preprocessing(file)
 
     # split data
-    splits = splitter(clean_text, num_workers)
-    
-    # measure MapReduce run time
-    start = time()
+    split1, split2 = splitter(clean_text)
 
-    # map splits to mapper function
-    results = pool.map(mapper, splits)
-
-    # measure map time
-    map_time = time()
+    # pass splits to two mappers
+    mapper1 = mapper(split1)
+    mapper2 = mapper(split2)
 
     # shuffle sort mapper outputs
-    sorted_keyval_pairs = sort(*results)
+    sorted_keyval_pairs = sort(mapper1, mapper2)
 
     # partition sorted key-value pairs
-    partitions = partition(sorted_keyval_pairs, num_workers)
+    partition1, partition2 = partition(sorted_keyval_pairs)
 
-    # measure sort time
-    sort_time = time()
-
-    # pass partitions to pool
-    reductions = pool.map(reducer, partitions)
-
-    # measure reduce time
-    reduce_time = time()
+    # pass partition to two reducers
+    reducer1 = reducer(partition1)
+    reducer2 = reducer(partition2)
 
     # combine reducers
-    combined_reduction = {}
-
-    for reduction in reductions:
-        combined_reduction.update(reduction)
+    combined_reducers = {**reducer1, **reducer2}
 
     # end run time
     end = time()
 
     # convert to df
-    df = pd.DataFrame.from_dict(combined_reduction, orient='index', columns=['Value']).reset_index()
+    df = pd.DataFrame.from_dict(combined_reducers, orient='index', columns=['Value']).reset_index()
     df.columns = ['year', 'Max temp']
 
-    # print results
-    print(f"\nMapping time = {map_time-start} s")
-    print(f"Sort and partition time = {sort_time-map_time} s")
-    print(f"Reducing time = {end-sort_time} s")
-    print(f"Total running time = {end-start} s\n\nResults:\n")
-    print(df.to_string(index=False))
+    # print and save
+    print("Total running time = {} s\n".format(end-start))
+    print(df)
 
-    # save to csv
-    df.to_csv("Homework-1/data/output.csv", index = False)
+    df.to_csv("data/output.csv", index = False)
 
 if __name__ == '__main__':
     main()
