@@ -8,7 +8,7 @@ import multiprocessing
 def preprocessing(file: str) -> list[str]:
 
     '''
-    This function returns a list of strings in the format "(YEAR-MONTH, TEMP), (YEAR-MONTH, TEMP)"
+    This function returns a list of strings in the format "(YEAR-MONTH, TEMP), (YEAR-MONTH, TEMP)".
     '''
     
     # empty return list
@@ -47,7 +47,7 @@ def splitter(input: list[str], num_splits: int = 2) -> list[list[str]]:
 def mapper(split: list[list[str]]) -> list[tuple]:
 
     '''
-    This maps the input split into key-value pairs and modifies the key to year only. Returns a list of tuples in the form of (YEAR, TEMP)
+    This maps the input split into key-value pairs and modifies the key to year only. Returns a list of tuples in the form of (YEAR, TEMP).
     '''
 
     # create empty return list
@@ -71,7 +71,7 @@ def mapper(split: list[list[str]]) -> list[tuple]:
 def sort(*multiple_keyval_pairs) -> list[tuple]:
 
     '''
-    This function combines the seperated key-value pairs and sorts on the year key
+    This function combines the seperated key-value pairs and sorts on the year key.
     '''
     
     # recombine keyval_pairs
@@ -139,7 +139,7 @@ def main():
     '''
     
     #create pool of worker processes
-    num_workers = 2
+    num_workers = 4
     pool = multiprocessing.Pool(processes=num_workers)
 
     # get input file
@@ -200,5 +200,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-    splitter.__annotations__
