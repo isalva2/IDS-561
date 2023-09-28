@@ -45,3 +45,6 @@ CVS
 Backup[ ]of[ ]*.pages/
 Backup[ ]of[ ]*.key/
 Backup[ ]of[ ]*.numbers/
+
+# ignore data folder
+data/
