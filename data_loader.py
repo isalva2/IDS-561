@@ -89,7 +89,7 @@ def upload_folder(directory, collection, spatial, verbose=False):
     
     for filename in os.listdir(directory):
         if filename.endswith(".csv"):
-            if any(zip in filename for area in spatial_set):
+            if any(zip in filename for zip in spatial_set):
                 if verbose == True:
                     print(filename)
                 with open(os.path.join(directory, filename), "r") as file:
@@ -119,5 +119,7 @@ if __name__ == "__main__":
     db = client["ComEd"]
     col = db["data"]
     
-    
+    print(chicago_zips)
     upload_folder("./data/data/", col, chicago_zips, verbose=True)
+    
+    client.close()
