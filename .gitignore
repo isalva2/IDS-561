@@ -82,6 +82,8 @@ target/
 # exclude personal homework folder
 /homework/
 
+# private folder for API keys, sensitive paths, etc
+
 # Mac OS-specific storage files
 .DS_Store
 
