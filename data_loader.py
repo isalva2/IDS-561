@@ -84,22 +84,30 @@ def convert_data_types(row):
             row[col] = data_type(row[col])
     return row
 
-def upload_folder(directory, collection, verbose=False):
+def upload_folder(directory, collection, spatial, verbose=False):
+    spatial_set = set(spatial)
+    
     for filename in os.listdir(directory):
         if filename.endswith(".csv"):
-            if verbose == True:
-                print(filename)
-            with open(os.path.join(directory, filename), "r") as file:
-                reader = csv.DictReader(file)
-                data = [convert_data_types(row) for row in reader]
-                collection.insert_many(data)
+            if any(zip in filename for area in spatial_set):
                 if verbose == True:
-                    print(f"{filename} has been added")
+                    print(filename)
+                with open(os.path.join(directory, filename), "r") as file:
+                    reader = csv.DictReader(file)
+                    data = [convert_data_types(row) for row in reader]
+                    collection.insert_many(data)
+                    if verbose == True:
+                        print(f"{filename} has been added")
 
 if __name__ == "__main__":
     
     from pymongo.mongo_client import MongoClient
     from pymongo.server_api import ServerApi
+    import geopandas as gpd
+    
+    shapefile_path = "data/spatial/geo_export_86dc231e-3ba9-473c-a7a5-0e89f969d1f6.shp"
+    gdf = gpd.read_file(shapefile_path)
+    chicago_zips = list(gdf["zip"])
     
     uri_string = "private/uri.txt"
     with open(uri_string, "r") as file:
@@ -109,6 +117,7 @@ if __name__ == "__main__":
     client = MongoClient(uri, server_api = ServerApi("1"))
     
     db = client["ComEd"]
-    col = db["test_data"]
+    col = db["data"]
     
-    upload_folder("./data/test_data/", col, verbose=True)
+    
+    upload_folder("./data/data/", col, chicago_zips, verbose=True)
