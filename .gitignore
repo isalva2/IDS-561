@@ -83,6 +83,7 @@ target/
 /homework/
 
 # private folder for API keys, sensitive paths, etc
+/private/
 
 # Mac OS-specific storage files
 .DS_Store
