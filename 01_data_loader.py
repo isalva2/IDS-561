@@ -107,11 +107,7 @@ if __name__ == "__main__":
     
     shapefile_path = "data/spatial/geo_export_86dc231e-3ba9-473c-a7a5-0e89f969d1f6.shp"
     gdf = gpd.read_file(shapefile_path)
-    chicago_zips = list(gdf["zip"])
-    
-    # new list of remaining 20 zips to upload (some overlap guaranteed ahahahahh)
-    chicago_zips_str = ['60656', '60640', '60646', '60653', '60609', '60647', '60645', '60643', '60654', '60608', '60651', '60621', '60657', '60644', '60620', '60642', '60655', '60634', '60652', '60641']
-    chicago_zips = [int(str) for str in chicago_zips_str]
+    chicago_zips_str = list(gdf["zip"])
     
     uri_string = "private/uri.txt"
     with open(uri_string, "r") as file:
@@ -123,7 +119,6 @@ if __name__ == "__main__":
     db = client["ComEd"]
     col = db["data"]
     
-    print(chicago_zips)
-    upload_folder("./data/data/", col, chicago_zips, verbose=True)
+    upload_folder("./data/data/", col, chicago_zips_str, verbose=True)
     
     client.close()
