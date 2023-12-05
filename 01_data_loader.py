@@ -1,5 +1,5 @@
 """
-function to import data to data to MongoDB collection
+function to import data to MongoDB collection
 """
 import pymongo
 import csv
